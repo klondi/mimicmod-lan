@@ -16,7 +16,6 @@ set (PROJECT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 option(RELEASE "Release build, debug build if disabled" ON)
-option(LINK_SUPPORT "Allow hub linking" OFF)
 option(SSL_SUPPORT "Enable SSL support" ON)
 option(USE_OPENSSL "Use OpenSSL's SSL support" ON )
 option(SYSTEMD_SUPPORT "Enable systemd notify and journal logging" OFF)
