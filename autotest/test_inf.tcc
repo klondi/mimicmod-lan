@@ -1,5 +1,4 @@
 #include <uhub.h>
-#include <core/usermanager.h>
 
 #define USER_CID "GNSSMURMD7K466NGZIHU65TP3S3UZSQ6MN5B2RI"
 #define USER_PID "3A4545WFVGZLSGUXZLG7OS6ULQUVG3HM2T63I7Y"
@@ -15,8 +14,8 @@ static void inf_create_hub()
 {
 	net_initialize();
 	inf_hub = (struct hub_info*) hub_malloc_zero(sizeof(struct hub_info));
-	inf_hub->users = uman_init();
 	
+	inf_hub->users = uman_init();
 	inf_hub->acl = (struct acl_handle*) hub_malloc_zero(sizeof(struct acl_handle));
 	inf_hub->config = (struct hub_config*) hub_malloc_zero(sizeof(struct hub_config));
 	
@@ -26,10 +25,9 @@ static void inf_create_hub()
 
 static void inf_destroy_hub()
 {
-	/* FIXME */
+	uman_shutdown(inf_hub->users);
 	acl_shutdown(inf_hub->acl);
 	free_config(inf_hub->config);
-	uman_shutdown(inf_hub->users);
 	hub_free(inf_hub->acl);
 	hub_free(inf_hub->config);
 	hub_free(inf_hub);
