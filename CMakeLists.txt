@@ -1,6 +1,7 @@
  ##
 ## Makefile for uhub
 ## Copyright (C) 2007-2012, Jan Vidar Krey <janvidar@extatic.org>
+## Copyright (C) 2007-2013, Jan Vidar Krey <janvidar@extatic.org>
  #
 
 cmake_minimum_required (VERSION 2.8.2)
@@ -16,6 +17,7 @@ set (PROJECT_SOURCE_DIR "${CMAKE_SOURCE_DIR}/src")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/Modules)
 
 option(RELEASE "Release build, debug build if disabled" ON)
+option(LOWLEVEL_DEBUG, "Enable low level debug messages." OFF)
 option(SSL_SUPPORT "Enable SSL support" ON)
 option(USE_OPENSSL "Use OpenSSL's SSL support" ON )
 option(SYSTEMD_SUPPORT "Enable systemd notify and journal logging" OFF)
@@ -25,14 +27,26 @@ option(PCRE_SUPPORT "Enable PCRE support" ON)
 find_package(Git)
 find_package(Sqlite3)
 
+include(TestBigEndian)
+
+TEST_BIG_ENDIAN(BIGENDIAN)
+if (BIGENDIAN)
+	add_definitions(-DARCH_BIGENDIAN)
+endif()
+
 include(CheckSymbolExists) 
 include(CheckIncludeFile)
 include(CheckTypeSize)
 include(CheckCSourceRuns)
 
+if (NOT RELEASE)
+        add_definitions(-DDEBUG)
+endif()
+
 #Some functions need this to be found
 add_definitions(-D_GNU_SOURCE)
 set(CMAKE_REQUIRED_DEFINITIONS "${CMAKE_REQUIRED_DEFINITIONS} -D_GNU_SOURCE")
+
 if (SSL_SUPPORT)
 	if (USE_OPENSSL)
 		find_package(OpenSSL)
@@ -278,13 +292,17 @@ endif()
 configure_file ("${PROJECT_SOURCE_DIR}/version.h.in" "${PROJECT_SOURCE_DIR}/version.h")
 configure_file ("${PROJECT_SOURCE_DIR}/system.h.in" "${PROJECT_SOURCE_DIR}/system.h")
 
-mark_as_advanced(FORCE CMAKE_BUILD_TYPE)
-if (RELEASE)
-	set(CMAKE_BUILD_TYPE Release)
-	add_definitions(-DNDEBUG)
-else()
-	set(CMAKE_BUILD_TYPE Debug)
-	# add_definitions(-DDEBUG)
+# mark_as_advanced(FORCE CMAKE_BUILD_TYPE)
+# if (RELEASE)
+#	set(CMAKE_BUILD_TYPE Release)
+#	add_definitions(-DNDEBUG)
+#else()
+#	set(CMAKE_BUILD_TYPE Debug)
+#	add_definitions(-DDEBUG)
+#endif()
+
+if (LOWLEVEL_DEBUG)
+	add_definitions(-DLOWLEVEL_DEBUG)
 endif()
 
 if (UNIX)
